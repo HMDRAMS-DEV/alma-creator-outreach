@@ -71,25 +71,25 @@ export default function Discovery() {
           <div>
             <label className="text-sm font-medium text-gray-700">Platform</label>
             <div className="mt-2 flex space-x-4">
-              <label className="flex items-center text-gray-900">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="radio"
                   value="instagram"
                   checked={platform === 'instagram'}
                   onChange={(e) => setPlatform(e.target.value as 'instagram')}
-                  className="mr-2 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                <span className="text-sm font-medium">Instagram</span>
+                <span className="text-sm font-medium text-gray-900" style={{color: '#1f2937'}}>Instagram</span>
               </label>
-              <label className="flex items-center text-gray-900">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="radio"
                   value="tiktok"
                   checked={platform === 'tiktok'}
                   onChange={(e) => setPlatform(e.target.value as 'tiktok')}
-                  className="mr-2 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                <span className="text-sm font-medium">TikTok</span>
+                <span className="text-sm font-medium text-gray-900" style={{color: '#1f2937'}}>TikTok</span>
               </label>
             </div>
           </div>
