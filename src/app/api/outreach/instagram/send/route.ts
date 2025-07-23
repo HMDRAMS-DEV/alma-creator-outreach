@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       if (!result.success) {
         return NextResponse.json({
           error: 'Failed to send Instagram DM',
-          message: result.error || 'Unknown error occurred',
+          message: 'Unknown error occurred',
           details: result
         }, { status: 400 })
       }
@@ -71,28 +71,29 @@ export async function POST(request: NextRequest) {
     console.error('Instagram outreach error:', error)
     
     // Handle specific Instagram errors
-    if (error.message?.includes('login failed')) {
+    const errorMessage = error instanceof Error ? error.message : ''
+    if (errorMessage.includes('login failed')) {
       return NextResponse.json({
         error: 'Instagram authentication failed',
         message: 'Invalid credentials or account temporarily restricted'
       }, { status: 401 })
     }
 
-    if (error.message?.includes('rate limit')) {
+    if (errorMessage.includes('rate limit')) {
       return NextResponse.json({
         error: 'Instagram rate limit exceeded',
         message: 'Too many requests. Please wait before sending more messages.'
       }, { status: 429 })
     }
 
-    if (error.message?.includes('user not found')) {
+    if (errorMessage.includes('user not found')) {
       return NextResponse.json({
         error: 'Creator not found',
-        message: `Instagram user @${body.creatorUsername} does not exist or is private`
+        message: 'Instagram user does not exist or is private'
       }, { status: 404 })
     }
 
-    if (error.message?.includes('message blocked')) {
+    if (errorMessage.includes('message blocked')) {
       return NextResponse.json({
         error: 'Message blocked by Instagram',
         message: 'Instagram detected the message as spam or violation of community guidelines'
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       error: 'Instagram outreach failed',
-      message: error.message || 'An unexpected error occurred',
+      message: error instanceof Error ? error.message : 'An unexpected error occurred',
       note: 'This may be due to Instagram anti-automation measures. Consider using different credentials or waiting before retrying.'
     }, { status: 500 })
   }

@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
     console.error('Get creators error:', error)
     return NextResponse.json({
       error: 'Failed to fetch creators',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       followers: followers || 0,
       engagementRate: engagementRate || 0,
       status,
-      lastContact: null,
+      lastContact: '',
       score: score || 0,
       bio: bio || '',
       tags: tags || [],
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
     console.error('Create creator error:', error)
     return NextResponse.json({
       error: 'Failed to create creator',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }

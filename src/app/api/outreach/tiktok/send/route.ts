@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({
       error: 'TikTok outreach failed',
-      message: error.message || 'An unexpected error occurred',
+      message: error instanceof Error ? error.message : 'An unexpected error occurred',
       note: 'Make sure Python environment is set up with required TikTok automation dependencies'
     }, { status: 500 })
   }

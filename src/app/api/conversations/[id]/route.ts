@@ -188,7 +188,7 @@ export async function GET(
     console.error('Get conversation error:', error)
     return NextResponse.json({
       error: 'Failed to fetch conversation',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }
@@ -222,7 +222,7 @@ export async function PUT(
     ]
 
     // Filter only allowed updates
-    const updates = {}
+    const updates: any = {}
     for (const key of allowedUpdates) {
       if (body[key] !== undefined) {
         updates[key] = body[key]
@@ -246,7 +246,7 @@ export async function PUT(
     console.error('Update conversation error:', error)
     return NextResponse.json({
       error: 'Failed to update conversation',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }
@@ -289,7 +289,7 @@ export async function DELETE(
     console.error('Delete conversation error:', error)
     return NextResponse.json({
       error: 'Failed to delete conversation',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }

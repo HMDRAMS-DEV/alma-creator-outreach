@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
     console.error('Get conversations error:', error)
     return NextResponse.json({
       error: 'Failed to fetch conversations',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     console.error('Create conversation error:', error)
     return NextResponse.json({
       error: 'Failed to create conversation',
-      message: error.message
+      message: error instanceof Error ? error.message : 'An unexpected error occurred'
     }, { status: 500 })
   }
 }
