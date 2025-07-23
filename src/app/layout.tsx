@@ -29,14 +29,8 @@ export default function RootLayout({
                   </div>
                   <nav className="ml-10 flex space-x-8">
                     <a
-                      href="/"
-                      className="text-foreground hover:text-muted-foreground px-3 py-2 text-sm font-medium"
-                    >
-                      Dashboard
-                    </a>
-                    <a
                       href="/discovery"
-                      className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
+                      className="text-foreground hover:text-muted-foreground px-3 py-2 text-sm font-medium"
                     >
                       Discovery
                     </a>
@@ -45,12 +39,6 @@ export default function RootLayout({
                       className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
                     >
                       Creators
-                    </a>
-                    <a
-                      href="/conversations"
-                      className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
-                    >
-                      Conversations
                     </a>
                   </nav>
                 </div>
