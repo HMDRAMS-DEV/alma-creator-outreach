@@ -17,52 +17,52 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
-          <nav className="bg-white shadow-sm border-b border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background">
+          <nav className="border-b">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <h1 className="text-xl font-bold text-gray-900">
+                    <h1 className="text-xl font-bold">
                       Alma Creator Outreach
                     </h1>
                   </div>
                   <nav className="ml-10 flex space-x-8">
                     <a
                       href="/"
-                      className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                      className="text-foreground hover:text-muted-foreground px-3 py-2 text-sm font-medium"
                     >
                       Dashboard
                     </a>
                     <a
                       href="/discovery"
-                      className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                      className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
                     >
                       Discovery
                     </a>
                     <a
                       href="/creators"
-                      className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                      className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
                     >
                       Creators
                     </a>
                     <a
                       href="/conversations"
-                      className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                      className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium"
                     >
                       Conversations
                     </a>
                   </nav>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted-foreground">
                     {new Date().toLocaleDateString()}
                   </span>
                 </div>
               </div>
             </div>
           </nav>
-          <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <main>
             {children}
           </main>
         </div>

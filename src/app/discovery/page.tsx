@@ -1,6 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function Discovery() {
   const [hashtags, setHashtags] = useState('')
@@ -51,121 +56,103 @@ export default function Discovery() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-5">
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-          Creator Discovery
-        </h1>
-        <p className="mt-2 text-sm text-gray-500">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="border-b pb-5">
+        <h1 className="text-3xl font-bold">Creator Discovery</h1>
+        <p className="text-muted-foreground mt-2">
           Find and analyze rising creators on Instagram and TikTok
         </p>
       </div>
 
       {/* Discovery Form */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Run Discovery</h2>
-        </div>
-        <div className="p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Run Discovery</CardTitle>
+          <CardDescription>Configure your creator discovery settings</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
           {/* Platform Selection */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">Platform</label>
-            <div className="mt-2 flex space-x-4">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  value="instagram"
-                  checked={platform === 'instagram'}
-                  onChange={(e) => setPlatform(e.target.value as 'instagram')}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                />
-                <span className="text-sm font-medium text-gray-900" style={{color: '#1f2937'}}>Instagram</span>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  value="tiktok"
-                  checked={platform === 'tiktok'}
-                  onChange={(e) => setPlatform(e.target.value as 'tiktok')}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                />
-                <span className="text-sm font-medium text-gray-900" style={{color: '#1f2937'}}>TikTok</span>
-              </label>
-            </div>
+          <div className="space-y-3">
+            <Label>Platform</Label>
+            <RadioGroup 
+              value={platform} 
+              onValueChange={(value) => setPlatform(value as 'instagram' | 'tiktok')}
+              className="flex space-x-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="instagram" id="instagram" />
+                <Label htmlFor="instagram">Instagram</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="tiktok" id="tiktok" />
+                <Label htmlFor="tiktok">TikTok</Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Hashtags */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Hashtags (comma-separated)
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="hashtags">Hashtags (comma-separated)</Label>
+            <Input
+              id="hashtags"
               type="text"
               value={hashtags}
               onChange={(e) => setHashtags(e.target.value)}
               placeholder="productivity, entrepreneur, sidehustle"
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Enter hashtags without the # symbol
             </p>
           </div>
 
           {/* Instagram Credentials */}
           {platform === 'instagram' && (
-            <div className="space-y-4 p-4 bg-yellow-50 rounded-md">
-              <div className="flex items-center">
-                <span className="text-yellow-600 mr-2">⚠️</span>
-                <span className="text-sm text-yellow-800">
-                  Instagram credentials required for scraping
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    value={credentials.username}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardContent className="pt-6">
+                <div className="flex items-center mb-4">
+                  <span className="text-yellow-600 mr-2">⚠️</span>
+                  <span className="text-sm text-yellow-800">
+                    Instagram credentials required for scraping
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={credentials.password}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      value={credentials.username}
+                      onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={credentials.password}
+                      onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    />
+                  </div>
                 </div>
-              </div>
-              <p className="text-xs text-yellow-700">
-                Credentials are not stored and only used for this session
-              </p>
-            </div>
+                <p className="text-xs text-yellow-700 mt-4">
+                  Credentials are not stored and only used for this session
+                </p>
+              </CardContent>
+            </Card>
           )}
 
           {/* Run Button */}
-          <div>
-            <button
-              onClick={runDiscovery}
-              disabled={isRunning}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                isRunning
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-              }`}
-            >
-              {isRunning ? 'Running Discovery...' : 'Start Discovery'}
-            </button>
-          </div>
-        </div>
-      </div>
+          <Button 
+            onClick={runDiscovery} 
+            disabled={isRunning}
+            className="w-full"
+            size="lg"
+          >
+            {isRunning ? 'Running Discovery...' : 'Start Discovery'}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Results */}
       {results && (
