@@ -17,6 +17,7 @@ export interface Creator {
   updatedAt: Date
   metrics?: CreatorMetrics
   score?: CreatorScore
+  _tempData?: any
 }
 
 export interface CreatorMetrics {

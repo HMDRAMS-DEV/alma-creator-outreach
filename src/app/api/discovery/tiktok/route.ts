@@ -1,94 +1,69 @@
-import { NextResponse } from 'next/server'
-import { TikTokScraper } from '@/services/tiktok-scraper'
-import { CreatorScoringEngine } from '@/services/creator-scoring'
-import type { DiscoveryCriteria } from '@/types/creator'
+import { NextRequest, NextResponse } from 'next/server';
+import { ApifyService } from '@/services/apify-scraper';
+import { CreatorScoringEngine } from '@/services/creator-scoring';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { hashtags, maxPosts = 15 } = body
+    const body = await request.json();
+    const { hashtags, maxResults = 50 } = body;
 
     if (!hashtags || !Array.isArray(hashtags) || hashtags.length === 0) {
       return NextResponse.json(
-        { error: 'Hashtags are required' },
+        { error: 'Hashtags array is required' },
         { status: 400 }
-      )
+      );
     }
 
-    console.log('🚀 Starting TikTok discovery via API...')
+    const startTime = Date.now();
+    const apifyService = new ApifyService();
+    const scoringEngine = new CreatorScoringEngine();
 
-    const scraper = new TikTokScraper({
-      headless: true,
-      maxPostsPerHashtag: Math.min(maxPosts, 10), // Cap at 10 for safety
-      timeout: 300000 // 5 minutes
-    })
+    // Discover creators and their posts using Apify
+    const { creators, postsMap } = await apifyService.discoverCreatorsByTikTokHashtag(hashtags, maxResults);
 
-    const scoringEngine = new CreatorScoringEngine()
+    // Score the discovered creators using their actual posts
+    const scoredCreatorsPromises = creators.map(creator => {
+      const creatorPosts = postsMap.get(creator.username) || [];
+      return scoringEngine.scoreCreator(creator, creatorPosts, hashtags);
+    });
 
-    // Create discovery criteria
-    const criteria: DiscoveryCriteria = {
-      platforms: ['tiktok'],
-      hashtags,
-      followerRange: [1000, 100000],
-      minEngagementRate: 0.03,
-      maxContactAttempts: 0
-    }
+    const scoredCreators = await Promise.all(scoredCreatorsPromises);
 
-    // Discover creators
-    const result = await scraper.discoverCreators(criteria)
+    // Sort by overall score and limit to the requested number
+    const qualifiedCreators = scoredCreators
+      .sort((a, b) => b.score.overall - a.score.overall)
+      .slice(0, maxResults);
 
-    if (result.creators.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No TikTok creators found - this is common due to anti-bot protection',
-        data: result,
-        note: 'TikTok actively blocks scrapers. Consider using their official API or manual research.'
-      })
-    }
-
-    // Score the creators
-    const postsMap = new Map()
-    for (const post of result.posts) {
-      if (!postsMap.has(post.username)) {
-        postsMap.set(post.username, [])
-      }
-      postsMap.get(post.username).push(post)
-    }
-
-    const targetNiches = ['productivity', 'business', 'entrepreneur', 'tech', 'lifestyle']
-    const scoredCreators = await scoringEngine.scoreCreators(result.creators, postsMap, targetNiches)
-
-    // Filter for qualified creators (TikTok typically has higher engagement)
-    const qualifiedCreators = scoredCreators.filter(creator => creator.score.overall >= 0.40)
-
-    console.log(`✅ TikTok discovery completed: ${qualifiedCreators.length} qualified creators`)
+    const endTime = Date.now();
+    const timeElapsed = endTime - startTime;
 
     return NextResponse.json({
       success: true,
-      message: `Found ${qualifiedCreators.length} qualified TikTok creators`,
       data: {
-        ...result,
         creators: qualifiedCreators,
+        stats: {
+          timeElapsed: timeElapsed,
+          qualifiedCount: qualifiedCreators.length,
+          totalScraped: creators.length, // Total unique creators found before limiting
+          hashtagsProcessed: hashtags.length,
+        },
         scoring: {
-          totalAnalyzed: scoredCreators.length,
-          qualified: qualifiedCreators.length,
-          averageScore: scoredCreators.length > 0 
-            ? scoredCreators.reduce((sum, c) => sum + c.score.overall, 0) / scoredCreators.length 
-            : 0
-        }
-      }
-    })
+          totalAnalyzed: qualifiedCreators.length,
+          averageScore: qualifiedCreators.length > 0
+            ? qualifiedCreators.reduce((sum, c) => sum + c.score.overall, 0) / qualifiedCreators.length
+            : 0,
+        },
+      },
+      message: `Discovered and scored ${qualifiedCreators.length} TikTok creators.`,
+    });
 
   } catch (error) {
-    console.error('❌ TikTok discovery API error:', error)
+    console.error('Apify TikTok discovery error:', error);
     
-    return NextResponse.json(
-      { 
-        error: 'TikTok discovery failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        note: 'TikTok discovery often fails due to anti-scraping measures. This is expected.'
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      error: 'TikTok discovery failed via Apify',
+      message: error instanceof Error ? error.message : 'An unexpected error occurred',
+      note: 'This could be due to an issue with the Apify service or your API key.'
+    }, { status: 500 });
   }
 }
