@@ -9,7 +9,7 @@ import { ConversationIntent, MessageIntent } from '@/types/conversation'
 import type { Creator } from '@/types/creator'
 
 interface AIConversationOptions {
-  apiKey: string
+  apiKey?: string
   model?: string
   maxTokens?: number
 }
@@ -19,12 +19,12 @@ export class AIConversationHandler {
   private model: string
   private maxTokens: number
 
-  constructor(options: AIConversationOptions) {
+  constructor(options?: AIConversationOptions) {
     this.anthropic = new Anthropic({
-      apiKey: options.apiKey
+      apiKey: options?.apiKey || process.env.ANTHROPIC_API_KEY || ''
     })
-    this.model = options.model || 'claude-3-5-sonnet-20241022'
-    this.maxTokens = options.maxTokens || 300
+    this.model = options?.model || 'claude-3-5-sonnet-20241022'
+    this.maxTokens = options?.maxTokens || 300
   }
 
   async handleIncomingMessage(

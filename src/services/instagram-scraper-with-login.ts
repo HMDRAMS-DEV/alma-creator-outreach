@@ -14,7 +14,7 @@ interface InstagramScraperOptions {
   credentials?: LoginCredentials
 }
 
-export class InstagramScraperWithLogin {
+export class InstagramScraperService {
   private browser: Browser | null = null
   private page: Page | null = null
   private options: InstagramScraperOptions
