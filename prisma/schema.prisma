@@ -1,0 +1,277 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Creator {
+  id                String      @id @default(cuid())
+  username          String
+  platform          Platform
+  followerCount     Int?
+  estimatedFollowers Int
+  engagementRate    Float       @default(0.0)
+  profileImageUrl   String?
+  bio               String?
+  isVerified        Boolean     @default(false)
+  postCount         Int?
+  lastPostDate      DateTime?
+  status            CreatorStatus @default(DISCOVERED)
+  contactAttempts   Int         @default(0)
+  lastContactDate   DateTime?
+  
+  // Scoring and metrics
+  overallScore      Float?
+  growthPotential   Float?
+  engagementQuality Float?
+  contentConsistency Float?
+  audienceQuality   Float?
+  nicheRelevance    Float?
+  
+  // Calculated metrics
+  avgLikes          Float?
+  avgComments       Float?
+  avgViews          Float?
+  postFrequency     Float?
+  contentQuality    Float?
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Relations
+  conversations     Conversation[]
+  posts             Post[]
+  outreachAttempts  OutreachAttempt[]
+  
+  @@unique([username, platform])
+  @@map("creators")
+}
+
+model Post {
+  id            String      @id @default(cuid())
+  postId        String      // Original post ID from platform
+  creatorId     String
+  creator       Creator     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  platform      Platform
+  content       String?
+  likes         Int         @default(0)
+  comments      Int         @default(0)
+  shares        Int?
+  views         Int?
+  mediaType     MediaType?
+  hashtags      String[]
+  mentions      String[]
+  location      String?
+  
+  timestamp     DateTime
+  createdAt     DateTime    @default(now())
+  
+  @@unique([postId, platform])
+  @@map("posts")
+}
+
+model Conversation {
+  id                String              @id @default(cuid())
+  creatorId         String
+  creator           Creator             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  status            ConversationStatus  @default(INITIAL_OUTREACH)
+  intent            ConversationIntent  @default(UNKNOWN)
+  qualificationScore Float?
+  nextAction        String?
+  scheduledFollowUp DateTime?
+  tags              String[]
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  messages          Message[]
+  
+  @@map("conversations")
+}
+
+model Message {
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  content         String
+  isFromAI        Boolean      @default(false)
+  isFromCreator   Boolean      @default(false)
+  intent          MessageIntent?
+  sentiment       Sentiment?
+  platform        Platform?
+  messageType     MessageType?
+  originalMessageId String?
+  
+  timestamp       DateTime     @default(now())
+  
+  @@map("messages")
+}
+
+model OutreachAttempt {
+  id          String      @id @default(cuid())
+  creatorId   String
+  creator     Creator     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  templateId  String?
+  platform    Platform
+  messageContent String
+  
+  status      OutreachStatus @default(SENT)
+  sentAt      DateTime    @default(now())
+  openedAt    DateTime?
+  respondedAt DateTime?
+  
+  error       String?
+  metadata    Json?
+  
+  @@map("outreach_attempts")
+}
+
+model Template {
+  id          String      @id @default(cuid())
+  name        String
+  platform    Platform?   // null means all platforms
+  type        TemplateType
+  subject     String?
+  content     String
+  variables   String[]    // Available placeholders
+  
+  // Conditions
+  minFollowers Int?
+  maxFollowers Int?
+  minEngagementRate Float?
+  contentCategories String[]
+  
+  isActive    Boolean     @default(true)
+  successRate Float?
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@map("templates")
+}
+
+model DiscoveryRun {
+  id            String      @id @default(cuid())
+  platform      Platform
+  hashtags      String[]
+  criteria      Json        // Store full criteria as JSON
+  
+  creatorsFound Int         @default(0)
+  postsScraped  Int         @default(0)
+  timeElapsed   Int         @default(0) // milliseconds
+  errors        String[]
+  
+  status        RunStatus   @default(RUNNING)
+  startedAt     DateTime    @default(now())
+  completedAt   DateTime?
+  
+  @@map("discovery_runs")
+}
+
+// Enums
+enum Platform {
+  INSTAGRAM
+  TIKTOK
+}
+
+enum CreatorStatus {
+  DISCOVERED
+  ANALYZING
+  QUALIFIED
+  CONTACTED
+  RESPONDED
+  INTERESTED
+  NEGOTIATING
+  PARTNERED
+  REJECTED
+  BLACKLISTED
+}
+
+enum ConversationStatus {
+  INITIAL_OUTREACH
+  AWAITING_RESPONSE
+  IN_PROGRESS
+  QUALIFIED_LEAD
+  NOT_INTERESTED
+  ESCALATED
+  COMPLETED
+  ARCHIVED
+}
+
+enum ConversationIntent {
+  DISCOVERY
+  QUALIFICATION
+  INTERESTED
+  NEEDS_INFO
+  PRICING_INQUIRY
+  REJECTION
+  SPAM
+  UNKNOWN
+}
+
+enum MessageIntent {
+  GREETING
+  QUESTION
+  INTEREST
+  REJECTION
+  REQUEST_INFO
+  PRICING
+  AVAILABILITY
+  AGREEMENT
+  COMPLAINT
+  SPAM
+  OTHER
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum MessageType {
+  DM
+  COMMENT
+  MENTION
+}
+
+enum OutreachStatus {
+  SENT
+  DELIVERED
+  OPENED
+  RESPONDED
+  FAILED
+  BOUNCED
+}
+
+enum TemplateType {
+  INITIAL_OUTREACH
+  FOLLOW_UP
+  RESPONSE
+  CLOSING
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  CAROUSEL
+  STORY
+  REEL
+}
+
+enum RunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
