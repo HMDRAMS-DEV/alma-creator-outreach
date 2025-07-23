@@ -71,25 +71,25 @@ export default function Discovery() {
           <div>
             <label className="text-sm font-medium text-gray-700">Platform</label>
             <div className="mt-2 flex space-x-4">
-              <label className="flex items-center">
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   value="instagram"
                   checked={platform === 'instagram'}
                   onChange={(e) => setPlatform(e.target.value as 'instagram')}
-                  className="mr-2"
+                  className="mr-2 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                Instagram
+                <span className="text-sm font-medium">Instagram</span>
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   value="tiktok"
                   checked={platform === 'tiktok'}
                   onChange={(e) => setPlatform(e.target.value as 'tiktok')}
-                  className="mr-2"
+                  className="mr-2 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                 />
-                TikTok
+                <span className="text-sm font-medium">TikTok</span>
               </label>
             </div>
           </div>
