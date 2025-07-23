@@ -60,7 +60,7 @@ export default function Discovery() {
       <div className="border-b pb-5">
         <h1 className="text-3xl font-bold">Creator Discovery</h1>
         <p className="text-muted-foreground mt-2">
-          Find and analyze rising creators on Instagram and TikTok
+          Find and analyze rising creators on Instagram and TikTok using shadcn/ui
         </p>
       </div>
 
